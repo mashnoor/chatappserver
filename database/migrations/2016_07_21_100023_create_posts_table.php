@@ -16,6 +16,7 @@ class CreatePostsTable extends Migration
             $table->increments('id');
             $table->integer('user_id')->unsigned();
             $table->text('name');
+            $table->text('mime');
             $table->timestamps();
         });
     }

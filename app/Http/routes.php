@@ -25,4 +25,10 @@ Route::post('adduser', 'UserController@adduser');
 
 Route::get('latestposts/{number}', 'UserController@getLatestPosts');
 
+Route::get('getfile/{filename}', 'UserController@getfile');
+
+Route::post('addimage/{number}', 'UserController@add_userimage');
+
+Route::get('getimage/{filename}', 'UserController@getimage');
+
 

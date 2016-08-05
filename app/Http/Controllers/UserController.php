@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Post;
 use App\User;
+use Carbon\Carbon;
 use Faker\Provider\Uuid;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 use App\Http\Requests;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Http\Response;
 
 class UserController extends Controller
 {
@@ -66,11 +69,42 @@ class UserController extends Controller
 
         $post = new Post();
         $post->name = Uuid::uuid();
-        $user->posts()->save($post);
 
 
          $audio_file = Input::file('audio');
-        $audio_file->move(base_path() . "/uploads/" , $post->name . $audio_file->getClientOriginalExtension());
+        //$audio_file->move(base_path() . "/uploads/" , $post->name . "." . $audio_file->getClientOriginalExtension());
+        Storage::put(
+            'uploads/'.$post->name,
+            file_get_contents($audio_file->getRealPath())
+        );
+
+        $post->mime = $audio_file->getClientMimeType();
+        $user->posts()->save($post);
+
+        return "yo";
+
+
+
+    }
+
+
+    public function add_userimage($number)
+    {
+
+      
+
+
+
+
+
+        $image_file = Input::file('userimage');
+        //$audio_file->move(base_path() . "/uploads/" , $post->name . "." . $audio_file->getClientOriginalExtension());
+        Storage::put(
+            'userimages/'.$number,
+            file_get_contents($image_file->getRealPath())
+        );
+
+
         return "yo";
 
 
@@ -87,6 +121,7 @@ class UserController extends Controller
     public function adduser(Request $request)
     {
         $user_Phone = $request->user_phone;
+        $user_name = $request->user_name;
 
         if(User::where('user_phone', '=', $user_Phone)->exists())
         {
@@ -95,12 +130,37 @@ class UserController extends Controller
 
         $user = new User();
         $user->user_phone = $user_Phone;
+        $user->user_name = $user_name;
         $user->save();
         return "hi";
 
 
 
     }
+
+    public function getfile($filename)
+    {
+
+        $post = Post::where('name', '=', $filename)->first();
+
+        $file = Storage::get('/uploads/' . $filename);
+
+        return (new Response($file, 200))
+            ->header('Content-Type', $post->mime);
+    }
+
+    public function getimage($filename)
+    {
+
+
+
+        $file = Storage::get('/userimages/' . $filename);
+
+        return (new Response($file, 200))
+            ->header('Content-Type', 'image/jpeg');
+    }
+
+
 
     public function getLatestPosts($number)
     {
@@ -124,7 +184,13 @@ class UserController extends Controller
                 $post_id =  $latestpost->name;
 
                 $tmp["post_id"] = $post_id;
+               $tmp["time"] = Carbon::parse($latestpost->created_at)->format("d/m/Y");
+                $tmp["user_name"] = $curr_frnd->user_name;
+
+
                 array_push($allLatestPosts, $tmp);
+
+
                 //return $post_id;
             }
             else
