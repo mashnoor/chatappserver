@@ -122,6 +122,7 @@ class UserController extends Controller
     {
         $user_Phone = $request->user_phone;
         $user_name = $request->user_name;
+   
 
         if(User::where('user_phone', '=', $user_Phone)->exists())
         {
@@ -209,6 +210,13 @@ class UserController extends Controller
 
 
 
+    }
+
+    public function getFriends($number)
+    {
+         $user = User::where('user_phone', '=', $number)->first();
+         $friends = $user->getFriends();
+         return $friends;
     }
 
 

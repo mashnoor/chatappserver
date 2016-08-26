@@ -31,4 +31,6 @@ Route::post('addimage/{number}', 'UserController@add_userimage');
 
 Route::get('getimage/{filename}', 'UserController@getimage');
 
+Route::get('getfriends/{number}', 'UserController@getFriends');
+
 
