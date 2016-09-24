@@ -33,4 +33,8 @@ Route::get('getimage/{filename}', 'UserController@getimage');
 
 Route::get('getfriends/{number}', 'UserController@getFriends');
 
+Route::get('getallposts/{number}', 'UserController@getallposts');
+
+Route::post('postcomment', 'CommentController@postcomment');
+
 

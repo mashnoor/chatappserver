@@ -79,6 +79,7 @@ class UserController extends Controller
         );
 
         $post->mime = $audio_file->getClientMimeType();
+        $post->txtpost = $request->txtpost;
         $user->posts()->save($post);
 
         return "yo";
@@ -185,8 +186,10 @@ class UserController extends Controller
                 $post_id =  $latestpost->name;
 
                 $tmp["post_id"] = $post_id;
-               $tmp["time"] = Carbon::parse($latestpost->created_at)->format("d/m/Y");
+               //$tmp["time"] = Carbon::parse($latestpost->created_at)->format("d/m/Y");
+                $tmp["time"] = $latestpost->created_at->diffForHumans();
                 $tmp["user_name"] = $curr_frnd->user_name;
+                $tmp["txtpost"] = $latestpost->txtpost;
 
 
                 array_push($allLatestPosts, $tmp);
@@ -217,6 +220,14 @@ class UserController extends Controller
          $user = User::where('user_phone', '=', $number)->first();
          $friends = $user->getFriends();
          return $friends;
+    }
+
+    public function getallposts($number)
+    {
+        $user = User::where('user_phone', '=', $number)->first();
+        $user_posts = Post::where('user_id', '=', $user->id)->orderBy('created_at', 'desc')->get();
+
+        return $user_posts;
     }
 
 
