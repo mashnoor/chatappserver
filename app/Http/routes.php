@@ -37,4 +37,8 @@ Route::get('getallposts/{number}', 'UserController@getallposts');
 
 Route::post('postcomment', 'CommentController@postcomment');
 
+Route::get('post/{post_id}/islikedby/{user_id}', 'LikeController@isLikedBy');
+Route::get('post/{user_id}/like/{post_id}', 'LikeController@like');
+
+Route::get('gettimeline/{user_id}', 'TimelineController@getTimeline');
 
