@@ -20,7 +20,7 @@ class LikeController extends Controller
         return 'false';
     }
 
-    public function like($post_id, $user_id)
+    public function like($user_id, $post_id)
     {
         echo $user_id;
         $post = Post::findOrFail($post_id)->first();

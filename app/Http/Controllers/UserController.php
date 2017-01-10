@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Requests;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Http\Response;
+use App\Like;
 
 class UserController extends Controller
 {
@@ -134,7 +135,7 @@ class UserController extends Controller
         $user->user_phone = $user_Phone;
         $user->user_name = $user_name;
         $user->save();
-        return "hi";
+        return $user;
 
 
 
@@ -162,6 +163,24 @@ class UserController extends Controller
             ->header('Content-Type', 'image/jpeg');
     }
 
+    public function login($user_phone)
+    {
+        $user = User::where('user_phone', '=', $user_phone)->first();
+        if($user==null)
+        {
+            return 'error';
+        }
+        return $user;
+    }
+
+    public function isLikedBy($post_id, $user_id)
+    {
+
+        if (Like::whereUserId($user_id)->wherePostId($post_id)->exists()){
+            return true;
+        }
+        return false;
+    }
 
 
     public function getLatestPosts($number)
@@ -178,18 +197,27 @@ class UserController extends Controller
             $curr_frnd = User::find($friend['id']);
             $tmp = array();
 
-            $tmp["number"] = $curr_frnd->user_phone;
+            $tmp["userPhone"] = $curr_frnd->user_phone;
             $latestpost = Post::where('user_id', '=', $curr_frnd->id)->orderBy('created_at', 'desc')->first();
             if($latestpost!=null)
             {
                 //$tmp["post_id"] = $latestpost->name;
                 $post_id =  $latestpost->name;
+                $tmp["id"] = (string)$latestpost->id;
 
-                $tmp["post_id"] = $post_id;
+                $tmp["voiceFile"] = $post_id;
                //$tmp["time"] = Carbon::parse($latestpost->created_at)->format("d/m/Y");
                 $tmp["time"] = $latestpost->created_at->diffForHumans();
-                $tmp["user_name"] = $curr_frnd->user_name;
-                $tmp["txtpost"] = $latestpost->txtpost;
+                $tmp["userName"] = $curr_frnd->user_name;
+                $tmp["txtPost"] = $latestpost->txtpost;
+                if($this->isLikedBy($tmp["id"], $user->id))
+                {
+                    $tmp["liked"] = true;
+                }
+                else
+                {
+                    $tmp["liked"] = false;
+                }
 
 
                 array_push($allLatestPosts, $tmp);
